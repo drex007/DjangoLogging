@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-
+from pythonjsonlogger.jsonlogger import JsonFormatter
+from djangologging.logging_formatters import CustomJsonFormatter
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -55,11 +56,13 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         "main_formatter": {
-            'format': "{asctime} - {levelname} - {module} - {message}",
-            "style": "{",
+            #We are not logger using the default formatter in django rather we are using the jsonformatter, to see the default formatter was used, refer to the previous commit 
+            # 'format': "{asctime} - {levelname} - {module} - {message}",
+            # "style": "{",
+            '()': CustomJsonFormatter,
         }    
     },
-    
+     
     'handlers': {
         'console': {
             'class': "logging.StreamHandler",
@@ -69,7 +72,14 @@ LOGGING = {
             'class': "logging.FileHandler",
             'filename': 'info.log',
             'formatter': 'main_formatter'
-        }
+        },
+        #Assuming you have celery installed and you want to log the celery activties, you differentiate the celery logs from the normal logs
+        #
+        # 'celery_logs': {
+        #     'class': "logging.FileHandler",
+        #     'filename': 'celery.log',
+        #     'formatter': 'main_formatter'
+        # }
         
     },
     'loggers': {
@@ -77,7 +87,13 @@ LOGGING = {
             'handlers': ['file', 'console'],
             'propagate': True,
             'level': 'INFO'
-        }
+        },
+        #You can declare your logger at this point and then and specify the kind of handlers you will like to use from the list below  
+        # 'celery': {
+        #     'handlers': ['celery_logs', 'console'],
+        #     'propagate': True,
+        #     'level': 'INFO'
+        # }
     }
     
 }
